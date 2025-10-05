@@ -1281,7 +1281,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _target: {fileID: 1766622822}
   _distance: 2
-  _speed: 6
+  _speed: 3
+  _gravityScaler: 3.14
 --- !u!54 &1460693035
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1308,7 +1309,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 80
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!1 &1556502879
 GameObject:
   m_ObjectHideFlags: 0
