@@ -6,7 +6,6 @@ public class Enemy : MonoBehaviour
     [SerializeField] private Transform _target;
     [SerializeField] private float _distance;
     [SerializeField] private float _speed;
-    [SerializeField] private float _gravityScaler;
 
     private Rigidbody _rigidbody;
 
@@ -22,15 +21,11 @@ public class Enemy : MonoBehaviour
         if (IsEnoughToTarget() == false)
         {
             Vector3 velocity  = GetDistance().normalized;
-            velocity.y = 0;
             velocity *= _speed * Time.fixedDeltaTime;
-            velocity += gravity;
             _rigidbody.Move(transform.position + velocity, Quaternion.identity);
         }
-        else
-        {
-            _rigidbody.Move(transform.position + gravity, Quaternion.identity);
-        }
+        
+        _rigidbody.velocity += gravity;
     }
 
     private bool IsEnoughToTarget()
