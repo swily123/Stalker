@@ -449,7 +449,7 @@ GameObject:
   - component: {fileID: 631387635}
   - component: {fileID: 631387634}
   - component: {fileID: 631387633}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1420,14 +1420,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _target: {fileID: 1766622822}
   _distance: 2
-  _speed: 3
+  _speed: 5
   _groundCheckDistance: 1.1
   _groundLayer:
     serializedVersion: 2
     m_Bits: 8
   _maxStepHeight: 0.5
-  _stepCheckDistance: 0.77
-  _stepStrength: 2
+  _stepCheckDistance: 0.65
+  _stepStrength: 3
 --- !u!54 &1460693035
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1572,7 +1572,7 @@ GameObject:
   - component: {fileID: 1588956481}
   - component: {fileID: 1588956480}
   - component: {fileID: 1588956479}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Level
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1677,7 +1677,7 @@ GameObject:
   - component: {fileID: 1589744395}
   - component: {fileID: 1589744394}
   - component: {fileID: 1589744393}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1887,7 +1887,7 @@ GameObject:
   - component: {fileID: 1723808945}
   - component: {fileID: 1723808944}
   - component: {fileID: 1723808943}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1992,7 +1992,7 @@ GameObject:
   - component: {fileID: 1735143851}
   - component: {fileID: 1735143850}
   - component: {fileID: 1735143849}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2246,7 +2246,7 @@ GameObject:
   - component: {fileID: 1768564124}
   - component: {fileID: 1768564123}
   - component: {fileID: 1768564122}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2453,7 +2453,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1794693246}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Ladder (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

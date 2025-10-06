@@ -20,6 +20,7 @@ public class Enemy : MonoBehaviour
 
     private Rigidbody _rigidbody;
     private Collider _collider;
+    private bool _isGrounded;
     
     private void Awake()
     {
@@ -32,23 +33,25 @@ public class Enemy : MonoBehaviour
         if (IsEnoughToTarget() == false)
         {
             Vector3 gravity = Physics.gravity * Time.fixedDeltaTime;
-            bool isGrounded = Physics.Raycast(transform.position, Vector3.down, _groundCheckDistance, _groundLayer);
+            _isGrounded = Physics.Raycast(transform.position, Vector3.down, _groundCheckDistance, _groundLayer);
 
-            if (isGrounded)
+            if (_isGrounded)
             {
                 Vector3 direction = GetDirection().normalized;
-                Vector3 velocityY = Vector3.zero;
+                Vector3 velocity = direction * (_speed * Time.fixedDeltaTime);
                 
                 direction.y = 0;
                 gravity = Vector3.down * Time.fixedDeltaTime;
                 
-                if (IsStepAhead(direction, out Vector3 stepSize))
+                if (IsStepAhead(direction, out float stepSize))
                 {
-                    _rigidbody.position = _rigidbody.position + Vector3.up * (stepSize.y * _stepStrength);
+                    velocity.y = 0;
+                    _rigidbody.position = _rigidbody.position + Vector3.up * stepSize + velocity;
                 }
-                
-                Vector3 velocity = direction * (_speed * Time.fixedDeltaTime);
-                _rigidbody.Move(transform.position + velocity + velocityY + gravity, Quaternion.identity);
+                else
+                {
+                    _rigidbody.Move(transform.position + velocity + gravity, Quaternion.identity);
+                }
             }
             else
             {
@@ -75,10 +78,10 @@ public class Enemy : MonoBehaviour
         return  _target.position - transform.position;
     }
 
-    private bool IsStepAhead(Vector3 moveDirection, out Vector3 stepSize)
+    private bool IsStepAhead(Vector3 moveDirection, out float stepSize)
     {
         Vector3 checkDirection = moveDirection.normalized;
-        stepSize = Vector3.zero;
+        stepSize = 0;
             
         float bottomY = transform.position.y - (_collider.bounds.size.y / 2);
 
@@ -99,7 +102,7 @@ public class Enemy : MonoBehaviour
 
         if (footBlocked)
         {
-            stepSize = hit.collider.bounds.size;
+            stepSize = hit.collider.bounds.size.y;
         }
 
         return footBlocked && kneeClear;
