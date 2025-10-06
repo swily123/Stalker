@@ -17,7 +17,7 @@ public class Player : MonoBehaviour
     {
         if (_characterController.isGrounded)
         {
-            Vector3 playerSpeed = _inputReader.PlayerInput * (_speed * Time.deltaTime);
+            Vector3 playerSpeed = _inputReader.PlayerInput.normalized * (_speed * Time.deltaTime);
             _characterController.Move(playerSpeed + Vector3.down);
         }
         else
