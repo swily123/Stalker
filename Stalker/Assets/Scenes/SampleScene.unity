@@ -1426,7 +1426,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   _maxStepHeight: 0.5
-  _stepCheckDistance: 0.8
+  _stepCheckDistance: 0.77
   _stepStrength: 2
 --- !u!54 &1460693035
 Rigidbody:

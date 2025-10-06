@@ -37,17 +37,18 @@ public class Enemy : MonoBehaviour
             if (isGrounded)
             {
                 Vector3 direction = GetDirection().normalized;
+                Vector3 velocityY = Vector3.zero;
+                
                 direction.y = 0;
                 gravity = Vector3.down * Time.fixedDeltaTime;
                 
-                if (IsStepAhead(direction))
+                if (IsStepAhead(direction, out Vector3 stepSize))
                 {
-                    //_rigidbody.AddForce(Vector3.up * _stepStrength, ForceMode.Impulse);
-                    _rigidbody.Move(transform.position + Vector3.up * (_maxStepHeight * _stepStrength), Quaternion.identity);
+                    _rigidbody.position = _rigidbody.position + Vector3.up * (stepSize.y * _stepStrength);
                 }
                 
                 Vector3 velocity = direction * (_speed * Time.fixedDeltaTime);
-                _rigidbody.Move(transform.position + velocity + gravity, Quaternion.identity);
+                _rigidbody.Move(transform.position + velocity + velocityY + gravity, Quaternion.identity);
             }
             else
             {
@@ -73,28 +74,34 @@ public class Enemy : MonoBehaviour
     {
         return  _target.position - transform.position;
     }
-    
-    private bool IsStepAhead(Vector3 moveDirection)
+
+    private bool IsStepAhead(Vector3 moveDirection, out Vector3 stepSize)
     {
         Vector3 checkDirection = moveDirection.normalized;
-    
+        stepSize = Vector3.zero;
+            
         float bottomY = transform.position.y - (_collider.bounds.size.y / 2);
-    
+
         Vector3 footRayOrigin = new Vector3(
-            transform.position.x, 
+            transform.position.x,
             bottomY + 0.05f,
             transform.position.z
         );
-    
+
         Vector3 kneeRayOrigin = new Vector3(
             transform.position.x,
             bottomY + _maxStepHeight,
             transform.position.z
         );
-        
-        bool footBlocked = Physics.Raycast(footRayOrigin, checkDirection, _stepCheckDistance);
+
+        bool footBlocked = Physics.Raycast(footRayOrigin, checkDirection, out RaycastHit hit, _stepCheckDistance);
         bool kneeClear = Physics.Raycast(kneeRayOrigin, checkDirection, _stepCheckDistance) == false;
-    
+
+        if (footBlocked)
+        {
+            stepSize = hit.collider.bounds.size;
+        }
+
         return footBlocked && kneeClear;
     }
 }
