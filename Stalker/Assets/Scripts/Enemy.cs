@@ -4,106 +4,74 @@
 [RequireComponent(typeof(Collider))]
 public class Enemy : MonoBehaviour
 {
-    [Header("Movement")]  
+    [Header("Movement")]
     [SerializeField] private Transform _target;
-    [SerializeField] private float _distance;
-    [SerializeField] private float _speed;
-    
-    [Header("Ground Detection")]  
+    [SerializeField] private float _distance = 0.5f;
+    [SerializeField] private float _speed = 3f;
+
+    [Header("Ground Detection")]
     [SerializeField] private float _groundCheckDistance = 1.1f;
-    [SerializeField] private LayerMask _groundLayer;
-    
-    [Header("Step Detection")]  
+    [SerializeField] private LayerMask _groundLayer = ~0;
+
+    [Header("Step Detection")]
     [SerializeField] private float _maxStepHeight = 0.3f;
     [SerializeField] private float _stepCheckDistance = 0.5f;
-    [SerializeField] private float _stepStrength = 1;
+    [SerializeField] private float _stepStrength = 3f;
 
     private Rigidbody _rigidbody;
     private Collider _collider;
     private bool _isGrounded;
-    
+
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
         _collider = GetComponent<Collider>();
+        _rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+        _rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
     }
 
     private void FixedUpdate()
     {
-        if (IsEnoughToTarget() == false)
-        {
-            Vector3 gravity = Physics.gravity * Time.fixedDeltaTime;
-            _isGrounded = Physics.Raycast(transform.position, Vector3.down, _groundCheckDistance, _groundLayer);
+        if (_target == null) return;
 
-            if (_isGrounded)
-            {
-                Vector3 direction = GetDirection().normalized;
-                Vector3 velocity = direction * (_speed * Time.fixedDeltaTime);
-                
-                direction.y = 0;
-                gravity = Vector3.down * Time.fixedDeltaTime;
-                
-                if (IsStepAhead(direction, out float stepSize))
-                {
-                    velocity.y = 0;
-                    _rigidbody.position = _rigidbody.position + Vector3.up * stepSize + velocity;
-                }
-                else
-                {
-                    _rigidbody.Move(transform.position + velocity + gravity, Quaternion.identity);
-                }
-            }
-            else
-            {
-                _rigidbody.Move(transform.position + gravity, Quaternion.identity);
-            }
+        Vector3 toTarget = _target.position - transform.position;
+
+        if (toTarget.sqrMagnitude <= _distance * _distance)
+        {
+            _rigidbody.velocity = new Vector3(0f, _rigidbody.velocity.y, 0f);
+            return;
+        }
+
+        Vector3 dir = new Vector3(toTarget.x, 0f, toTarget.z);
+
+        if (dir.sqrMagnitude > 0.0001f) 
+            dir.Normalize();
+
+        _isGrounded = Physics.Raycast(transform.position, Vector3.down, _groundCheckDistance, _groundLayer, QueryTriggerInteraction.Ignore);
+
+        Vector3 desiredHorizontal = dir * _speed;
+
+        if (_isGrounded && StepAhead(dir))
+        {
+            float vy = Mathf.Max(_rigidbody.velocity.y, _stepStrength);
+            _rigidbody.velocity = new Vector3(desiredHorizontal.x, vy, desiredHorizontal.z);
+        }
+        else
+        {
+            _rigidbody.velocity = new Vector3(desiredHorizontal.x, _rigidbody.velocity.y, desiredHorizontal.z);
         }
     }
 
-    private void OnDrawGizmos()
+    private bool StepAhead(Vector3 moveDir)
     {
-        Gizmos.color = Color.green;
-        Gizmos.DrawRay(transform.position, Vector3.down * _groundCheckDistance);
-    }
-    
-    private bool IsEnoughToTarget()
-    {
-        float distance = GetDirection().sqrMagnitude;
-        bool isTouch = distance <= _distance * _distance;
-        return isTouch;
-    }
+        Bounds b = _collider.bounds;
+        float bottomY = b.min.y;
 
-    private Vector3 GetDirection()
-    {
-        return  _target.position - transform.position;
-    }
+        Vector3 originLow = new Vector3(b.center.x, bottomY + 0.05f, b.center.z);
+        Vector3 originHigh = new Vector3(b.center.x, bottomY + _maxStepHeight, b.center.z);
 
-    private bool IsStepAhead(Vector3 moveDirection, out float stepSize)
-    {
-        Vector3 checkDirection = moveDirection.normalized;
-        stepSize = 0;
-            
-        float bottomY = transform.position.y - (_collider.bounds.size.y / 2);
-
-        Vector3 footRayOrigin = new Vector3(
-            transform.position.x,
-            bottomY + 0.05f,
-            transform.position.z
-        );
-
-        Vector3 kneeRayOrigin = new Vector3(
-            transform.position.x,
-            bottomY + _maxStepHeight,
-            transform.position.z
-        );
-
-        bool footBlocked = Physics.Raycast(footRayOrigin, checkDirection, out RaycastHit hit, _stepCheckDistance);
-        bool kneeClear = Physics.Raycast(kneeRayOrigin, checkDirection, _stepCheckDistance) == false;
-
-        if (footBlocked)
-        {
-            stepSize = hit.collider.bounds.size.y;
-        }
+        bool footBlocked = Physics.Raycast(originLow, moveDir, _stepCheckDistance, _groundLayer, QueryTriggerInteraction.Ignore);
+        bool kneeClear = !Physics.Raycast(originHigh, moveDir, _stepCheckDistance, _groundLayer, QueryTriggerInteraction.Ignore);
 
         return footBlocked && kneeClear;
     }
